@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).parent.parent
 class PepParsePipeline:
     def open_spider(self, spider):
         self.counter = Counter()
-        
+
     def process_item(self, item, spider):
         self.counter[item['status']] += 1
         return item
@@ -28,10 +28,10 @@ class PepParsePipeline:
     def close_spider(self, spider):
         time = dt.now().strftime(DT_FORMAT)
         result_dir = BASE_DIR / 'results'
-        result_dir.mkdir(exist_ok=True)
         file_path = result_dir / FILE_NAME.format(time)
-        self.counter['Total'] = sum(self.counter.values())
         with open(file_path, mode='w', encoding='utf-8') as f:
             writer = csv.writer(f, dialect='unix')
             writer.writerow(['Cтатус', 'Количество'])
-            writer.writerow(self.counter.items())
+            for key, value in self.counter.items():
+                writer.writerow([key, value])
+            writer.writerow(['Total', sum(self.counter.values())])
